@@ -1,6 +1,7 @@
 extern crate rand;
 
-pub mod population;
-pub mod phenotype;
-pub mod mutation;
 pub mod crossover;
+pub mod mutation;
+pub mod phenotype;
+pub mod population;
+pub mod serializable;
