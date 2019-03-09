@@ -123,9 +123,9 @@ impl Eq for Solution {}
 impl Ord for Solution {
     fn cmp(&self, other: &Solution) -> Ordering {
         if self.fitness > other.fitness {
-            Ordering::Less
-        } else {
             Ordering::Greater
+        } else {
+            Ordering::Less
         }
     }
 }
@@ -153,7 +153,7 @@ impl phenotype::Phenotype<Solution> for Solution {
             fitness: fitness,
         };
     }
-    
+
     fn crossover(&self, partner: &Solution) -> [Solution; 2] {
         let mut rng = SmallRng::from_entropy();
 
