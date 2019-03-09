@@ -1,6 +1,6 @@
-use rand::Rng;
-use rand::FromEntropy;
 use rand::rngs::SmallRng;
+use rand::FromEntropy;
+use rand::Rng;
 
 use super::phenotype::Phenotype;
 
@@ -9,7 +9,7 @@ where
     T: Phenotype<T> + Ord + Clone,
 {
     population: Vec<T>,
-    mutation_rate: f32,    // How likley is it that an individual will mutate?
+    mutation_rate: f32,    // How likely is it that an individual will mutate?
     population_cap: usize, // What is the largest our population can be
 }
 
@@ -43,7 +43,6 @@ where
     pub fn crossover(&mut self) {
         let mut rng = SmallRng::from_entropy();
         let mut new_children: Vec<T> = Vec::new();
-        self.population.sort();
 
         for (i, parent_one) in self.population.iter().enumerate() {
             let chance = rng.gen_range(0, self.population.len());
@@ -54,6 +53,7 @@ where
                     if second_chance > j || j == (self.population.len() - 1) {
                         let children = parent_one.crossover(parent_two);
                         new_children.extend_from_slice(&children);
+                        break;
                     }
                 }
             }
@@ -66,13 +66,13 @@ where
         self.population.drain(self.population_cap..);
     }
 
-    pub fn get_result(&mut self, iterations: u32) -> Option<&T> {
+    pub fn get_result(&mut self, iterations: u32) -> &T {
         for _i in 0..iterations {
             self.crossover();
-            self.prune();
             self.mutate();
+            self.prune();
         }
 
-        return self.population.iter().max();
+        return self.population.iter().max().unwrap();
     }
 }

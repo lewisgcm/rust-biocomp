@@ -20,7 +20,6 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn single_point_test() {
@@ -40,14 +39,5 @@ mod tests {
 
         assert_eq!(children[0], [1, 2, 9]);
         assert_eq!(children[1], [7, 8, 3, 4, 5, 6]);
-    }
-
-    #[bench]
-    fn single_point_bench(b: &mut Bencher) {
-        let parent_one: Vec<u8> = vec![1, 2, 3];
-        let parent_two: Vec<u8> = vec![4, 5, 6];
-        b.iter(|| {
-            single_point(1, &parent_one, &parent_two);
-        });
     }
 }

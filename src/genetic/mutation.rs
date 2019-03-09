@@ -26,7 +26,6 @@ pub fn flip_bits(genotype: &mut Vec<u8>) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn flip_bits_test() {
@@ -40,21 +39,5 @@ mod tests {
         let mut bits: Vec<u8> = vec![0b00000010];
         flip_bit(0, 6, &mut bits);
         assert_eq!(bits, [0b01000010]);
-    }
-
-    #[bench]
-    fn flip_bits_benchmark(b: &mut Bencher) {
-        let mut bits: Vec<u8> = vec![0b00100010];
-        b.iter(|| {
-            flip_bits(&mut bits);
-        });
-    }
-
-    #[bench]
-    fn flip_bit_benchmark(b: &mut Bencher) {
-        let mut bits: Vec<u8> = vec![0b00100010];
-        b.iter(|| {
-            flip_bit(0, 6, &mut bits);
-        });
     }
 }
