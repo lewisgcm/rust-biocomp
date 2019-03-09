@@ -4,8 +4,10 @@ extern crate rand;
 use rand::rngs::SmallRng;
 use rand::FromEntropy;
 use rand::Rng;
+use rand::seq::SliceRandom;
 
 use biocomp::genetic::phenotype;
+use biocomp::genetic::crossover;
 use biocomp::genetic::population::Population;
 use std::cmp::Ordering;
 
@@ -116,37 +118,27 @@ fn fitness(data: &Vec<u8>) -> f32 {
     return total_distance;
 }
 
-impl Solution {
-    fn fitness(&self) -> f32 {
-        return self.fitness;
-    }
-}
-
 impl Eq for Solution {}
 
 impl Ord for Solution {
     fn cmp(&self, other: &Solution) -> Ordering {
-        if self.fitness() > other.fitness() {
-            Ordering::Greater
-        } else {
+        if self.fitness > other.fitness {
             Ordering::Less
+        } else {
+            Ordering::Greater
         }
     }
 }
 
 impl PartialOrd for Solution {
     fn partial_cmp(&self, other: &Solution) -> Option<Ordering> {
-        if self.fitness() > other.fitness() {
-            Some(Ordering::Greater)
-        } else {
-            Some(Ordering::Less)
-        }
+        return Some(self.cmp(other));
     }
 }
 
 impl PartialEq for Solution {
-    fn eq(&self, other: &Solution) -> bool {
-        return self.fitness() == other.fitness();
+    fn eq(&self, _other: &Solution) -> bool {
+        return false;
     }
 }
 
@@ -154,46 +146,44 @@ impl phenotype::Phenotype<Solution> for Solution {
     fn new_random() -> Solution {
         let mut slice: Vec<u8> = (0..(CITIES.len() as u8)).collect();
         let mut rng = SmallRng::from_entropy();
-        rng.shuffle(&mut slice);
+        slice.shuffle(&mut rng);
         let fitness = fitness(&slice);
         return Solution {
             data: slice,
             fitness: fitness,
         };
     }
-
+    
     fn crossover(&self, partner: &Solution) -> [Solution; 2] {
         let mut rng = SmallRng::from_entropy();
 
-        let mut child_one = self.data.to_owned();
-        rng.shuffle(&mut child_one);
-
-        let mut child_two = partner.data.to_owned();
-        rng.shuffle(&mut child_two);
+        let index = rng.gen_range(0, self.data.len());
+        let children = crossover::unique_single_point(index, &self.data, &partner.data);
 
         return [
             Solution {
-                data: child_one.clone(),
-                fitness: fitness(&child_one),
+                data: children[0].clone(),
+                fitness: fitness(&children[0]),
             },
             Solution {
-                data: child_two.clone(),
-                fitness: fitness(&child_two),
+                data: children[1].clone(),
+                fitness: fitness(&children[1]),
             },
         ];
     }
 
     fn mutate(&mut self) {
-        //mutation::flip_bits(&mut self.data);
+        let mut rng = SmallRng::from_entropy();
+        self.data.shuffle(&mut rng);
     }
 }
 
 fn main() {
-    let mut population: Population<Solution> = Population::new(0.0, 500);
+    let mut population: Population<Solution> = Population::new(0.05, 500);
     population.populate();
     let solution = population.get_result(2000);
     for i in solution.data.clone() {
         print!("{} -> ", CITIES[i as usize].name);
     }
-    print!("END\nfitness: {:?} \n", solution.fitness());
+    print!("END\nfitness: {:?} \n", solution.fitness);
 }

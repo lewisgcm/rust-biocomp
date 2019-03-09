@@ -62,7 +62,7 @@ where
     }
 
     pub fn prune(&mut self) {
-        self.population.sort();
+        self.population.sort_unstable();
         self.population.drain(self.population_cap..);
     }
 
